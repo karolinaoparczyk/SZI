@@ -3,7 +3,7 @@ import pygame
 
 class Area(pygame.sprite.Sprite):
 
-    types = ['grass', 'road', 'garbage_dump']
+    types = ['grass', 'road', 'garbage_dump', None]
 
     def __init__(self, type, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -14,6 +14,8 @@ class Area(pygame.sprite.Sprite):
             self.image = pygame.image.load("images/road_small.jpg")
         elif type == self.types[2]:
             self.image = pygame.image.load("images/garbage_dump_small.jpg")
+        elif type == self.types[3]:
+            self.image = pygame.image.load("images/white.png")
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

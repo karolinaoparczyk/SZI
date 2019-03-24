@@ -3,7 +3,7 @@ import pygame
 
 class GarbageCollector(pygame.sprite.Sprite):
 
-    def __init__(self, container_capacity, window_size, grasses, houses, garbage_dump, x, y):
+    def __init__(self, container_capacity, window_size, grasses, houses, garbage_dump, white_boxes, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.container_capacity = container_capacity
         self.garbage_amount = 0
@@ -11,6 +11,7 @@ class GarbageCollector(pygame.sprite.Sprite):
         self.grasses = grasses
         self.houses = houses
         self.garbage_dump = garbage_dump
+        self.white_boxes = white_boxes
         self.image = pygame.image.load("images/garbage_collector_small.png")
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -22,6 +23,10 @@ class GarbageCollector(pygame.sprite.Sprite):
             self.rect.x += self.step
             for grass in self.grasses:
                 if self.rect.colliderect(grass.rect):
+                    self.rect.x -= self.step
+                    break
+            for white_box in self.white_boxes:
+                if self.rect.colliderect(white_box.rect):
                     self.rect.x -= self.step
                     break
             for house in self.houses:
@@ -44,6 +49,10 @@ class GarbageCollector(pygame.sprite.Sprite):
                 if self.rect.colliderect(grass.rect):
                     self.rect.x += self.step
                     break
+            for white_box in self.white_boxes:
+                if self.rect.colliderect(white_box.rect):
+                    self.rect.x += self.step
+                    break
             for house in self.houses:
                 if self.rect.colliderect(house.rect):
                     garbage_taken = house.garbage_amount
@@ -64,6 +73,10 @@ class GarbageCollector(pygame.sprite.Sprite):
                 if self.rect.colliderect(grass.rect):
                     self.rect.y += self.step
                     break
+            for white_box in self.white_boxes:
+                if self.rect.colliderect(white_box.rect):
+                    self.rect.y += self.step
+                    break
             for house in self.houses:
                 if self.rect.colliderect(house.rect):
                     garbage_taken = house.garbage_amount
@@ -82,6 +95,10 @@ class GarbageCollector(pygame.sprite.Sprite):
             self.rect.y += self.step
             for grass in self.grasses:
                 if self.rect.colliderect(grass.rect):
+                    self.rect.y -= self.step
+                    break
+            for white_box in self.white_boxes:
+                if self.rect.colliderect(white_box.rect):
                     self.rect.y -= self.step
                     break
             for house in self.houses:
