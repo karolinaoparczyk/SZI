@@ -1,18 +1,13 @@
 import sys
 
 import pygame
+import random
 from pygame.locals import *
 
-from helpers import get_map, render_models, auto_map
+from helpers import get_map, render_models, auto_map, display_text
 
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
-
-
-def display_text(text):
-    label = myfont.render(text, True, (255, 0, 0))
-    DISPLAYSURF.blit(label, (750, 0))
-
 
 pygame.init()
 
@@ -24,13 +19,19 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-all_sprites_list, garbage_collector = render_models(get_map(1), WINDOW_SIZE)
+all_sprites_list, houses, garbage_collector = render_models(get_map(random.randrange(1, 5)), WINDOW_SIZE)
 # all_sprites_list, garbage_collector = auto_map(WINDOW_SIZE)
 
 garbage_amount = 0
 
 while True:
-    display_text("Ilość śmieci: {}".format(garbage_amount))
+    display_text(myfont, DISPLAYSURF,
+                 f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600, 0)
+
+    for house in houses:
+        display_text(myfont, DISPLAYSURF, f"{house.garbage_amount}", house.rect.x,
+                     house.rect.y + 10)
+
     pygame.display.update()
     for event in pygame.event.get():
 
@@ -60,4 +61,3 @@ while True:
     pygame.display.flip()
 
     fpsClock.tick(FPS)
-

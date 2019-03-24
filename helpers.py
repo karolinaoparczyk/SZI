@@ -8,6 +8,11 @@ from models.garbage_collector import GarbageCollector
 from models.house import House
 
 
+def display_text(myfont, DISPLAYSURF, text, width, height):
+    label = myfont.render(text, True, (255, 0, 0))
+    DISPLAYSURF.blit(label, (width, height))
+
+
 def get_map(number):
     with open(f'maps/MAPA{number}.csv') as map:
         columns = []
@@ -39,16 +44,16 @@ def render_models(map, WINDOW_SIZE):
             elif pattern_road.search(row):
                 roads.append(Area('road', idx_c * 30, idx_r * 30 + 30))
             elif pattern_house.search(row):
-                houses.append(House(100, idx_c * 30, idx_r * 30 + 30))
+                houses.append(House(random.randint(1, 200), idx_c * 30, idx_r * 30 + 30))
     all_sprites_list.add(white_boxes)
     all_sprites_list.add(grasses)
     all_sprites_list.add(roads)
     all_sprites_list.add(houses)
     all_sprites_list.add(garbage_dump)
-    garbage_collector = GarbageCollector(250, WINDOW_SIZE, grasses, houses, garbage_dump, white_boxes,
+    garbage_collector = GarbageCollector(450, WINDOW_SIZE, grasses, houses, garbage_dump, white_boxes,
                                          garbage_collector_position[0], garbage_collector_position[1])
     all_sprites_list.add(garbage_collector)
-    return all_sprites_list, garbage_collector
+    return all_sprites_list, houses, garbage_collector
 
 
 def auto_map(WINDOW_SIZE):
