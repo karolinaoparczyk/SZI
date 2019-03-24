@@ -11,7 +11,7 @@ myfont = pygame.font.SysFont(None, 25)
 
 pygame.init()
 
-FPS = 30
+FPS = 60
 fpsClock = pygame.time.Clock()
 
 WINDOW_SIZE = (900, 900)
