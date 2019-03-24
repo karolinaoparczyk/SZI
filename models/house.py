@@ -3,8 +3,10 @@ import pygame
 
 class House(pygame.sprite.Sprite):
 
-    def __init__(self, container_capacity):
+    def __init__(self, garbage_amount, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.container_capacity = container_capacity
-        self.image = pygame.image.load("images/house.png")
+        self.garbage_amount = garbage_amount
+        self.image = pygame.image.load("images/house_small.png")
         self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y

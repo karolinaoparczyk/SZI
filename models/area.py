@@ -13,7 +13,7 @@ class Area(pygame.sprite.Sprite):
         elif type == self.types[1]:
             self.image = pygame.image.load("images/road_small.jpg")
         elif type == self.types[2]:
-            self.image = pygame.image.load("images/garbage_dump.jpg")
+            self.image = pygame.image.load("images/garbage_dump_small.jpg")
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
