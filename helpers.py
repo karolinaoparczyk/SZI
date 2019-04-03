@@ -21,7 +21,30 @@ def get_map(number):
         return columns
 
 
-def render_models(map, WINDOW_SIZE):
+def create_grid(map):
+    pattern_grass = re.compile("G")
+    pattern_road = re.compile("R")
+    pattern_garbage_dump = re.compile("GD")
+    pattern_house = re.compile("H")
+    grid = []
+    for (idx_c, column) in enumerate(map):
+        grid.append([])
+        for (idx_r, row) in enumerate(column):
+            if idx_r == 0:
+                grid[idx_c].append(Area(None, (idx_c, 0)))
+            position = (idx_c, idx_r+1)
+            if pattern_garbage_dump.search(row):
+                grid[idx_c].append(Area('garbage_dump', position))
+            elif pattern_grass.search(row):
+                grid[idx_c].append(Area('grass', position))
+            elif pattern_road.search(row):
+                grid[idx_c].append(Area('road', position))
+            elif pattern_house.search(row):
+                grid[idx_c].append(House(random.randint(1, 200), position))
+    return grid
+
+
+def color_grid(grid):
     all_sprites_list = pygame.sprite.Group()
     grasses = []
     roads = []
@@ -29,31 +52,26 @@ def render_models(map, WINDOW_SIZE):
     white_boxes = []
     garbage_dump = None
     garbage_collector_position = None
-    pattern_grass = re.compile("G")
-    pattern_road = re.compile("R")
-    pattern_garbage_dump = re.compile("GD")
-    pattern_house = re.compile("H")
-    for (idx_c, column) in enumerate(map):
-        white_boxes.append(Area(None, idx_c * 30, 0))
+    for (idx_c, column) in enumerate(grid):
+        white_boxes.append(grid[idx_c])
         for (idx_r, row) in enumerate(column):
-            if pattern_garbage_dump.search(row):
-                garbage_dump = Area('garbage_dump', idx_c * 30, idx_r * 30 + 30)
-                garbage_collector_position = (idx_c * 30, idx_r * 30 + 30)
-            elif pattern_grass.search(row):
-                grasses.append(Area('grass', idx_c * 30, idx_r * 30 + 30))
-            elif pattern_road.search(row):
-                roads.append(Area('road', idx_c * 30, idx_r * 30 + 30))
-            elif pattern_house.search(row):
-                houses.append(House(random.randint(1, 200), idx_c * 30, idx_r * 30 + 30))
+            if row.type == 'garbage_dump':
+                garbage_dump = grid[idx_c][idx_r]
+                garbage_collector_position = (idx_c, idx_r)
+            elif row.type == 'grass':
+                grasses.append(grid[idx_c][idx_r])
+            elif row.type == 'road':
+                roads.append(grid[idx_c][idx_r])
+            elif row.type == 'house':
+                houses.append(grid[idx_c][idx_r])
     all_sprites_list.add(white_boxes)
     all_sprites_list.add(grasses)
     all_sprites_list.add(roads)
     all_sprites_list.add(houses)
     all_sprites_list.add(garbage_dump)
-    garbage_collector = GarbageCollector(450, WINDOW_SIZE, grasses, houses, garbage_dump, white_boxes,
-                                         garbage_collector_position[0], garbage_collector_position[1])
+    garbage_collector = GarbageCollector(450, grid, garbage_collector_position)
     all_sprites_list.add(garbage_collector)
-    return all_sprites_list, houses, garbage_collector
+    return all_sprites_list, garbage_collector, houses
 
 
 def auto_map(WINDOW_SIZE):
