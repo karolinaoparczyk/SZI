@@ -1,6 +1,5 @@
 import pygame
 
-
 class GarbageCollector(pygame.sprite.Sprite):
 
     def __init__(self, container_capacity, window_size, grasses, houses, garbage_dump, white_boxes, x, y):
