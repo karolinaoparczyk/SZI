@@ -7,6 +7,10 @@ from models.area import Area
 from models.garbage_collector import GarbageCollector
 from models.house import House
 
+SOLUTIONS = []
+HOME_COUNT = 0
+CROSS = []
+
 
 def display_text(myfont, DISPLAYSURF, text, width, height):
     label = myfont.render(text, True, (255, 0, 0))
@@ -64,6 +68,7 @@ def color_grid(grid):
                 roads.append(grid[idx_c][idx_r])
             elif row.type == 'house':
                 houses.append(grid[idx_c][idx_r])
+    HOME_COUNT = len(houses)
     all_sprites_list.add(white_boxes)
     all_sprites_list.add(grasses)
     all_sprites_list.add(roads)
@@ -93,3 +98,29 @@ def color_grid(grid):
 #   ..operacje na gridie.. funkcja dodatkowa - przyjmuje grida i operację, zwraca zmienionego grida
 #   .. zwiększamy liste operacji..
 #   dfs_find(zmieniony grid, zwiekszona lista operacji)
+
+def dfs_find(grid, previous_move):
+    while HOME_COUNT > 0:
+        SOLUTIONS
+
+
+def check_crosses(grid, move):
+    for cross in CROSS:
+        if grid[move[0][move[1]] == cross:
+            #koniec dfs dla tej ścieżki
+            break
+
+def check_posible_moves(grid, GarbageCollector):
+    possibilities = []
+    if grid[GarbageCollector.position[0]][GarbageCollector.position[1]+1].type == 'road':
+        possibilities.append('U')
+    if grid[GarbageCollector.position[0]][GarbageCollector.position[1]-1].type == 'road':
+        possibilities.append('D')
+    if grid[GarbageCollector.position[0]-1][GarbageCollector.position[1]].type == 'road':
+        possibilities.append('L')
+    if grid[GarbageCollector.position[0]+1][GarbageCollector.position[1]].type == 'road':
+        possibilities.append('R')
+
+    if len(possibilities) > 1:
+        CROSS.append(GarbageCollector.position[0], GarbageCollector.position[1], [possibilities[0]])
+        return possibilities[0]
