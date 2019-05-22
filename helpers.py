@@ -292,14 +292,11 @@ def dfs_move(grid, position, last_move, visited_houses, counter, solution, count
     house_move = ['LH', 'UH', 'RH', 'DH']
     move = ['L', 'U', 'R', 'D']
 
-    counter += 1
-    if counter > 25:
-        if count != 0:
-            return 0
-        solutions.append(solution[:])
+    if len(solution) > 1000:
         return 0
     if count == 0:
         solutions.append(solution[:])
+        solution.clear()
         return 0
 
     for j in range(len(positions)):
@@ -354,3 +351,20 @@ def check_solutions(count):
 #   ..operacje na gridie.. funkcja dodatkowa - przyjmuje grida i operację, zwraca zmienionego grida
 #   .. zwiększamy liste operacji..
 #   dfs_find(zmieniony grid, zwiekszona lista operacji)
+
+
+# vowpal_wabbit
+# getting started/dependencies/building/installing/tutorial
+# ledna linia = jedna komórka danych:
+# 0 lub 1 (wymieniać/nie wymieniaćdachu) cena: 123 metraż: 123 rok(string)
+# (numer kroku/decyzja) 3 (stan planszy: lista komórek w bezpośrednim otoczeniu agenta oraz lista komórek w otoczeniu
+# agenta w drugim rzędzie) cellleft:1 cellright:1 cellup:0
+# po instalacji uruchomienie: vw
+# zapis: house.model
+# mogą być dwie osoby
+
+
+# svm skleam maszyny wektorów nośnych (support vector machines)
+# scikit-larn.org
+# decision trees
+# logistic regresion

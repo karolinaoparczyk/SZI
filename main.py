@@ -60,7 +60,7 @@ while x == 0:
         print(solution[index])
         solution = solution[index]
         while solution:
-            # time.sleep(0.2)
+            time.sleep(0.2)
             display_text(myfont, DISPLAYSURF,
                          f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600, 0)
 
