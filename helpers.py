@@ -151,7 +151,7 @@ def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
     last_move = ['R', 'D', 'L', 'U']
 
     counter += 1
-    if counter > 100:
+    if counter > 130:
         if count != 0:
             solution.pop()
             return 0
@@ -196,7 +196,40 @@ def check_solutions(count):
             solutions.pop(temp)
         temp -= 1
 
-# DFS
+
+def create_dataset(grid, solution, position):
+    f = open('dataset.txt', 'a')
+    move = ['L', 'U', 'R', 'D']
+    for i in solution:
+        if i == 'test':
+            continue
+        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
+                     [position[0], position[1] + 1]]
+        temp = ['', '', '', '', '']
+        if i == 'LH' or i == 'L':
+            temp[0] = 'L'
+        if i == 'UH' or i == 'U':
+            temp[0] = 'U'
+        if i == 'RH' or i == 'R':
+            temp[0] = 'R'
+        if i == 'DH' or i == 'D':
+            temp[0] = 'D'
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                temp[j+1] = '0'
+            if grid[positions[j][0]][positions[j][1]].type == 'road':
+                temp[j+1] = '1'
+            if grid[positions[j][0]][positions[j][1]].type == 'house':
+                temp[j+1] = '2'
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                temp[j+1] = '3'
+        f.write(f"{temp[0]}, {temp[1]}, {temp[2]}, {temp[3]}, {temp[4]}\n")
+        for j in range(len(move)):
+            if move[j] == i:
+                position = positions[j]
+    f.close()
+
+    # DFS
 # rekurencją
 # węzłem drzewa konkrenta sytuacja na planszy
 # gałęziamy (możliwościami) jest to wszystko, co może zrobic agent
