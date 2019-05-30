@@ -5,7 +5,7 @@ import pygame
 import random
 from pygame.locals import *
 
-from helpers import get_map, display_text, create_grid, color_grid, dfs_move
+from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions
 
 
 pygame.font.init()
@@ -21,7 +21,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(1))
+grid = create_grid(get_map(random.randint(1, 5)))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
@@ -43,12 +43,16 @@ while x == 0:
             sys.exit()
         position = garbage_collector.position
         visited_houses = []
-        last_move = position
         counter = 0
-        solution = []
-        solution = dfs_move(grid, position, last_move, visited_houses, counter, solution)
+        solution = ['test']
+        temp = 'start'
+        count = find_houses(grid)
+        print(count)
+        dfs_move(grid, position, visited_houses, counter, solution, count, temp)
+        check_solutions(count)
+        solution = solutions
         print(solution)
-        find = 3000
+        find = 30000
         for i in range(len(solution)):
             if len(solution[i]) < find:
                 find = len(solution[i])
@@ -56,6 +60,7 @@ while x == 0:
         print(solution[index])
         solution = solution[index]
         while solution:
+            # time.sleep(0.05)
             display_text(myfont, DISPLAYSURF,
                          f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600, 0)
 
@@ -65,7 +70,7 @@ while x == 0:
                              house.rect.y + 10)
 
             pygame.display.update()
-            move = solution.pop()
+            move = solution.pop(0)
             garbage_taken = 0
             if move == "R":
                 garbage_taken = garbage_collector.move_right()

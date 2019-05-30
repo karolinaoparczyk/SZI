@@ -7,7 +7,7 @@ from models.area import Area
 from models.garbage_collector import *
 from models.house import House
 
-sys.setrecursionlimit(3000)
+sys.setrecursionlimit(1000)
 
 
 def display_text(myfont, DISPLAYSURF, text, width, height):
@@ -74,6 +74,8 @@ def color_grid(grid):
     garbage_collector = GarbageCollector(45000, grid, garbage_collector_position)
     all_sprites_list.add(garbage_collector)
     return all_sprites_list, garbage_collector, houses
+
+
 #
 #
 # back_path = []
@@ -275,36 +277,67 @@ def color_grid(grid):
 solutions = []
 
 
-def dfs_move(grid, position, last_move, visited_houses, counter, solution):
+def find_houses(grid):
+    count = 0
+    for i in range(30):
+        for j in range(30):
+            if grid[i][j].type == 'house':
+                count += 1
+    return count
 
-    positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
+    positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
+                 [position[0], position[1] + 1]]
     house_move = ['LH', 'UH', 'RH', 'DH']
     move = ['L', 'U', 'R', 'D']
-    # counter += 1
-    # print(f"chuj {counter}")
-    # if counter > 22:
-    #     solutions.append(solution)
-    #     return solution
+    last_move = ['R', 'D', 'L', 'U']
+
+    counter += 1
+    if counter > 100:
+        if count != 0:
+            solution.pop()
+            return 0
+        solutions.append(solution[:])
+        return 0
+    if count == 0:
+        solutions.append(solution[:])
+        return 0
+
+    if temp != 'start':
+        solution.append(temp)
 
     for j in range(len(positions)):
         if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
-            last_move = position
+            count -= 1
             solution.append(house_move[j])
             visited_houses.append(positions[j])
-            dfs_move(grid, positions[j], last_move, visited_houses, counter, solution)
+            dfs_move(grid, position, visited_houses[:], counter, solution[:], count, temp)
 
     for i in range(len(positions)):
-        if grid[positions[i][0]][positions[i][1]].type == 'road' and positions[i] != last_move:
-            last_move = position
-            solution.append(move[i])
-            dfs_move(grid, positions[i], last_move, visited_houses, counter, solution)
+        if grid[positions[i][0]][positions[i][1]].type == 'road' and last_move[i] != solution[-1]:
+            temp = move[i]
+            dfs_move(grid, positions[i], visited_houses[:], counter, solution[:], count, temp)
 
-        if grid[positions[i][0]][positions[i][1]].type == 'garbage_dump':
-            solutions.append(solution)
-            return solution
+    for z in range(len(positions)):
+        if grid[positions[z][0]][positions[z][1]].type == 'garbage_dump':
+            solutions.append(solution[:])
+            return 0
 
-    return solutions
+    return 0
 
+
+def check_solutions(count):
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    temp = len(solutions) - 1
+    while temp >= 0:
+        counter = 0
+        for j in solutions[temp]:
+            if j in house_move:
+                counter += 1
+        if counter != count:
+            solutions.pop(temp)
+        temp -= 1
 
 # DFS
 # rekurencją
