@@ -5,7 +5,7 @@ import pygame
 import random
 from pygame.locals import *
 
-from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions
+from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, create_dataset
 
 
 pygame.font.init()
@@ -59,6 +59,7 @@ while x == 0:
                 index = i
         print(solution[index])
         solution = solution[index]
+        create_dataset(grid, solution, position)
         while solution:
             # time.sleep(0.05)
             display_text(myfont, DISPLAYSURF,
