@@ -94,7 +94,7 @@ def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
     last_move = ['R', 'D', 'L', 'U']
 
     counter += 1
-    if counter > 100:
+    if counter > 130:
         if count != 0:
             solution.pop()
             return 0
