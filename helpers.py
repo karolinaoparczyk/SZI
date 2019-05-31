@@ -48,7 +48,7 @@ def get_data_tree_from_file():
     possibilities_train = []
     possibilities_test = []
     i = 100
-    with open(f'data.txt') as data:
+    with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
                 choice = line[0]
