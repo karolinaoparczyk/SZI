@@ -18,7 +18,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(3))
+grid = create_grid(get_map(11))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
