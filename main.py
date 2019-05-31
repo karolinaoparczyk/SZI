@@ -1,10 +1,17 @@
 import sys
+import time
 
 import pygame
 from pygame.locals import *
 
-from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions
+from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, create_dataset
 
+from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
+    get_data_tree_from_file, train_decision_tree, generate_sample_data
+
+# generate_sample_data()
+choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
+train_decision_tree(choices_train, choices_test, possibilities_train, possibilities_test)
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
 
@@ -18,7 +25,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(11))
+grid = create_grid(get_map(3))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
@@ -57,6 +64,7 @@ while x == 0:
         print(solution[index])
         print("size: " + str(len(solution[index])))
         solution = solution[index]
+        create_dataset(grid, solution, position)
         while solution:
             # time.sleep(0.05)
             display_text(myfont, DISPLAYSURF,

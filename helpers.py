@@ -1,6 +1,7 @@
 import re
 import random
 import sys
+from sklearn import tree
 
 from models.area import Area
 from models.garbage_collector import *
@@ -20,6 +21,62 @@ def get_map(number):
         for line in map:
             columns.append(line.split(";"))
         return columns
+
+
+def generate_sample_data():
+    moves = ["L", "U", "R", "D"]
+    areas = [0, 1, 2, 3]
+    with open(f'data.txt', 'w') as data:
+        for i in range(120):
+            line = str(random.choice(moves)) + "," + str(random.choice(areas)) + "," + str(random.choice(areas)) + "," + \
+                   str(random.choice(areas)) + "," + str(random.choice(areas)) + "\n"
+            data.write(str(line))
+
+
+# 0 - grass
+# 1 - road
+# 2 - house
+# 3 - garbage dump
+# possibilities[0] - left
+# possibilities[1] - up
+# possibilities[2] - right
+# possibilities[3] - down
+
+def get_data_tree_from_file():
+    choices_train = []
+    choices_test = []
+    possibilities_train = []
+    possibilities_test = []
+    i = 100
+    with open(f'data.txt') as data:
+        for line in data:
+            if i > 0:
+                choice = line[0]
+                choices_train.append(choice)
+                moves = line[2:-1].split(",") #na końcu usuwamy znak nowej lini /n
+                possibilities_train.append(moves)
+                i -= 1
+            else:
+                choice = line[0]
+                choices_test.append(choice)
+                moves = line[2:-1].split(",")  # na końcu usuwamy znak nowej lini /n
+                possibilities_test.append(moves)
+    return choices_train, choices_test, possibilities_train, possibilities_test
+
+
+def train_decision_tree(choices_train, choices_test, possibilities_train, possibilities_test):
+    clf = tree.DecisionTreeClassifier()
+
+    clf = clf.fit(possibilities_train, choices_train)
+
+    decisions = clf.predict(possibilities_test)
+    write_tree_output_to_file(choices_test, decisions)
+
+
+def write_tree_output_to_file(choices_test, decisions):
+    with open(f'decision_tree_output.txt', 'w') as data:
+        for (choice_test, decision) in zip(choices_test, decisions):
+            data.write(str(choice_test) + ',' + str(decision) + '\n')
 
 
 def create_grid(map):
@@ -139,7 +196,40 @@ def check_solutions(count):
             solutions.pop(temp)
         temp -= 1
 
-# DFS
+
+def create_dataset(grid, solution, position):
+    f = open('dataset.txt', 'a')
+    move = ['L', 'U', 'R', 'D']
+    for i in solution:
+        if i == 'test':
+            continue
+        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
+                     [position[0], position[1] + 1]]
+        temp = ['', '', '', '', '']
+        if i == 'LH' or i == 'L':
+            temp[0] = 'L'
+        if i == 'UH' or i == 'U':
+            temp[0] = 'U'
+        if i == 'RH' or i == 'R':
+            temp[0] = 'R'
+        if i == 'DH' or i == 'D':
+            temp[0] = 'D'
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                temp[j+1] = '0'
+            if grid[positions[j][0]][positions[j][1]].type == 'road':
+                temp[j+1] = '1'
+            if grid[positions[j][0]][positions[j][1]].type == 'house':
+                temp[j+1] = '2'
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                temp[j+1] = '3'
+        f.write(f"{temp[0]}, {temp[1]}, {temp[2]}, {temp[3]}, {temp[4]}\n")
+        for j in range(len(move)):
+            if move[j] == i:
+                position = positions[j]
+    f.close()
+
+    # DFS
 # rekurencją
 # węzłem drzewa konkrenta sytuacja na planszy
 # gałęziamy (możliwościami) jest to wszystko, co może zrobic agent
