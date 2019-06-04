@@ -63,9 +63,9 @@ def train_decision_tree(choices_train, possibilities_train):
 # possible_choices_list = [[ , , , ]]
 
 
-def get_tree_decision(clf, possible_choices):
-    possible_choices_list = [possible_choices]
-    decision_list = clf.predict(possible_choices_list)
+def get_tree_decision(clf, possibilities_test, choices_test):
+    decision_list = clf.predict(possibilities_test)
+    write_output_to_file(choices_test, decision_list, "decision_tree_output")
     return decision_list[0]
 
 
@@ -77,8 +77,7 @@ def train_linear_regression(X_train, y_train):
 
 def get_linear_regression_decision(regr, X_test, y_test):
     decision = regr.predict(X_test)
-    for (dec, y) in zip(decision, y_test):
-        print(str(dec) + " " + str(y))
+    write_output_to_file(y_test, decision, "linear_regression_output")
     return decision
 
 
@@ -113,10 +112,13 @@ def decision_tree_move(grid, position, clf):
     return solution
 
 
-def write_tree_output_to_file(choices_test, decisions):
-    with open(f'decision_tree_output.txt', 'w') as data:
-        for (choice_test, decision) in zip(choices_test, decisions):
-            data.write(str(choice_test) + ',' + str(decision) + '\n')
+def write_output_to_file(expected_choices, decisions, filename):
+    print(expected_choices)
+    print(decisions)
+    with open('{}.txt'.format(filename), 'w') as data:
+        data.write("expected_choice, decision \n")
+        for (choice, decision) in zip(expected_choices, decisions):
+            data.write(str(choice) + ',' + str(decision) + '\n')
 
 
 def create_grid(map):
