@@ -53,13 +53,20 @@ def get_data_tree_from_file():
     return choices_train, choices_test, possibilities_train, possibilities_test
 
 
-def train_decision_tree(choices_train, choices_test, possibilities_train, possibilities_test):
+def train_decision_tree(choices_train, possibilities_train):
     clf = tree.DecisionTreeClassifier()
-
     clf = clf.fit(possibilities_train, choices_train)
+    return clf
 
-    decisions = clf.predict(possibilities_test)
-    write_tree_output_to_file(choices_test, decisions)
+
+# possible_choices = [ , , , ]
+# possible_choices_list = [[ , , , ]]
+
+
+def get_tree_decision(clf, possible_choices):
+    possible_choices_list = [possible_choices]
+    decision_list = clf.predict(possible_choices_list)
+    return decision_list[0]
 
 
 def write_tree_output_to_file(choices_test, decisions):

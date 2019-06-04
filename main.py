@@ -10,7 +10,7 @@ from helpers import get_map, display_text, create_grid, color_grid, dfs_move, fi
     get_data_tree_from_file, train_decision_tree
 
 choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
-train_decision_tree(choices_train, choices_test, possibilities_train, possibilities_test)
+clf = train_decision_tree(choices_train, possibilities_train)
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
 
