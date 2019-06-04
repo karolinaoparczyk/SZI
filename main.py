@@ -1,16 +1,28 @@
 import sys
 from random import randrange
+import numpy as np
 
 import pygame
 from pygame.locals import *
+from sklearn.model_selection import train_test_split
 
-from helpers import create_dataset
+from helpers import create_dataset, train_linear_regression, get_linear_regression_decision
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
     get_data_tree_from_file, train_decision_tree, decision_tree_move
 
-# choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
-# clf = train_decision_tree(choices_train, possibilities_train)
+
+#decision tree
+#choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
+#clf = train_decision_tree(choices_train, possibilities_train)
+
+#linear regression
+# X = np.asarray(possibilities_train)
+# y = choices_train
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=0)
+# regr = train_linear_regression(X_train, y_train)
+# decision = get_linear_regression_decision(regr, X_test, y_test)
+
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
 
@@ -24,7 +36,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(randrange(1,45)))
+grid = create_grid(get_map(1))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
