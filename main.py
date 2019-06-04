@@ -13,8 +13,8 @@ from helpers import get_map, display_text, create_grid, color_grid, dfs_move, fi
 
 
 #decision tree
-#choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
-#clf = train_decision_tree(choices_train, possibilities_train)
+choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
+clf = train_decision_tree(choices_train, possibilities_train)
 
 #linear regression
 # X = np.asarray(possibilities_train)
@@ -36,7 +36,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(1))
+grid = create_grid(get_map(5))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
@@ -57,24 +57,24 @@ while x == 0:
             pygame.quit()
             sys.exit()
         position = garbage_collector.position
-        visited_houses = []
-        counter = 0
-        solution = ['test']
-        temp = 'start'
-        count = find_houses(grid)
-        dfs_move(grid, position, visited_houses, counter, solution, count, temp)
-        check_solutions(count)
-
-        solution = solutions
-        find = 30000
-        for i in range(len(solution)):
-            if len(solution[i]) < find:
-                find = len(solution[i])
-                index = i
-
-        solution = solution[index]
-        create_dataset(grid, solution, position)
-        # solution = decision_tree_move(grid, position, clf)
+        # visited_houses = []
+        # counter = 0
+        # solution = ['test']
+        # temp = 'start'
+        # count = find_houses(grid)
+        # dfs_move(grid, position, visited_houses, counter, solution, count, temp)
+        # check_solutions(count)
+        #
+        # solution = solutions
+        # find = 30000
+        # for i in range(len(solution)):
+        #     if len(solution[i]) < find:
+        #         find = len(solution[i])
+        #         index = i
+        #
+        # solution = solution[index]
+        # create_dataset(grid, solution, position)
+        solution = decision_tree_move(grid, position, clf)
         print(solution)
         while solution:
             display_text(myfont, DISPLAYSURF,

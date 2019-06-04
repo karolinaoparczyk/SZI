@@ -31,6 +31,7 @@ def get_map(number):
 # possibilities[2] - right
 # possibilities[3] - down
 
+
 def get_data_tree_from_file():
     choices_train = []
     choices_test = []
@@ -86,29 +87,41 @@ def decision_tree_move(grid, position, clf):
     solution = []
     house_move = ['LH', 'UH', 'RH', 'DH']
     move = ['L', 'U', 'R', 'D']
+    move_id = ['6', '7', '8', '9']
+    positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
 
     for i in range(1000):
-        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
-                     [position[0], position[1] + 1]]
-        possible_moves = ['', '', '', '']
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        possible_moves = []
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
-                possible_moves[j] = '0'
+                possible_moves.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'road':
-                possible_moves[j] = '1'
+                possible_moves.append('1')
             if grid[positions[j][0]][positions[j][1]].type == 'house':
-                possible_moves[j] = '2'
+                possible_moves.append('2')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
-                possible_moves[j] = '3'
+                possible_moves.append('3')
 
         tree_move = get_tree_decision(clf, possible_moves)
         for j in range(len(move)):
-            if tree_move == move[j]:
-                if grid[positions[j][0]][positions[j][1]].type == 'house':
+            if int(tree_move) == int(move_id[j]):
+                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
                     solution.append(house_move[j])
-                if grid[positions[j][0]][positions[j][1]].type == 'road':
+                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
                     solution.append(move[j])
-                    position = positions[j]
+                    position = positions_for_move[j]
 
     return solution
 
