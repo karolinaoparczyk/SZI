@@ -113,8 +113,6 @@ def decision_tree_move(grid, position, clf):
 
 
 def write_output_to_file(expected_choices, decisions, filename):
-    print(expected_choices)
-    print(decisions)
     with open('{}.txt'.format(filename), 'w') as data:
         data.write("expected_choice, decision \n")
         for (choice, decision) in zip(expected_choices, decisions):
