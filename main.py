@@ -1,15 +1,14 @@
 import sys
-import time
+from random import randrange
 
 import pygame
 from pygame.locals import *
 
-from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, create_dataset
+from helpers import create_dataset
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
-    get_data_tree_from_file, train_decision_tree, generate_sample_data
+    get_data_tree_from_file, train_decision_tree
 
-# generate_sample_data()
 choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
 train_decision_tree(choices_train, choices_test, possibilities_train, possibilities_test)
 pygame.font.init()
@@ -25,7 +24,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(45))
+grid = create_grid(get_map(randrange(1,45)))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
@@ -51,22 +50,19 @@ while x == 0:
         solution = ['test']
         temp = 'start'
         count = find_houses(grid)
-        print(count)
         dfs_move(grid, position, visited_houses, counter, solution, count, temp)
         check_solutions(count)
+
         solution = solutions
-        print(solution)
         find = 30000
         for i in range(len(solution)):
             if len(solution[i]) < find:
                 find = len(solution[i])
                 index = i
-        print(solution[index])
-        print("size: " + str(len(solution[index])))
+
         solution = solution[index]
         create_dataset(grid, solution, position)
         while solution:
-            # time.sleep(0.05)
             display_text(myfont, DISPLAYSURF,
                          f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600,
                          0)
@@ -109,11 +105,6 @@ while x == 0:
             all_sprites_list.draw(DISPLAYSURF)
             pygame.display.flip()
         break
-    # all_sprites_list.update()
-    # DISPLAYSURF.blit(background_image, (0, 0))
-    # all_sprites_list.draw(DISPLAYSURF)
-    #
-    # pygame.display.flip()
 
     fpsClock.tick(FPS)
     break

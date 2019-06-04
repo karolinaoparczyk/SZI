@@ -22,17 +22,6 @@ def get_map(number):
             columns.append(line.split(";"))
         return columns
 
-
-def generate_sample_data():
-    moves = ["L", "U", "R", "D"]
-    areas = [0, 1, 2, 3]
-    with open(f'data.txt', 'w') as data:
-        for i in range(120):
-            line = str(random.choice(moves)) + "," + str(random.choice(areas)) + "," + str(random.choice(areas)) + "," + \
-                   str(random.choice(areas)) + "," + str(random.choice(areas)) + "\n"
-            data.write(str(line))
-
-
 # 0 - grass
 # 1 - road
 # 2 - house
@@ -228,27 +217,6 @@ def create_dataset(grid, solution, position):
             if move[j] == i:
                 position = positions[j]
     f.close()
-
-    # DFS
-# rekurencją
-# węzłem drzewa konkrenta sytuacja na planszy
-# gałęziamy (możliwościami) jest to wszystko, co może zrobic agent
-# zasada: nie powtarzamy ostatniej operacji
-# jak może coś odwiedzić (zebrać śmieci), to niech to zrobi
-# ucinanie ścieżki, jeśli robi zbyt dużo operacji (zapętlenie)
-
-# przyjmuje ciąd dotyczhczasowych operacji
-# dfs_find(GRID, CURRENT_OPERATIONS)
-# 1. sprawdź czy koniec (czy zadanie zostało wykonane/czy wszystkie punkty zostały wykonane)
-# a) TAK
-#   ..globalna SOLUTIONS = []..
-#   SOLUTIONS.append(current_operations)
-# b) NIE
-#   Sprawdź możliwości
-#   ..operacje na gridie.. funkcja dodatkowa - przyjmuje grida i operację, zwraca zmienionego grida
-#   .. zwiększamy liste operacji..
-#   dfs_find(zmieniony grid, zwiekszona lista operacji)
-
 
 # vowpal_wabbit
 # getting started/dependencies/building/installing/tutorial
