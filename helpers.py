@@ -1,7 +1,7 @@
 import re
 import random
 import sys
-from sklearn import tree
+from sklearn import tree, linear_model
 
 from models.area import Area
 from models.garbage_collector import *
@@ -40,15 +40,15 @@ def get_data_tree_from_file():
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
-                choice = line[0]
+                choice = int(line[0])
                 choices_train.append(choice)
-                moves = line[2:-1].split(",") #na końcu usuwamy znak nowej lini /n
+                moves = list(map(int, line[2:-1].split(","))) #na końcu usuwamy znak nowej lini /n
                 possibilities_train.append(moves)
                 i -= 1
             else:
-                choice = line[0]
+                choice = int(line[0])
                 choices_test.append(choice)
-                moves = line[2:-1].split(",")  # na końcu usuwamy znak nowej lini /n
+                moves = list(map(int, line[2:-1].split(",")))  # na końcu usuwamy znak nowej lini /n
                 possibilities_test.append(moves)
     return choices_train, choices_test, possibilities_train, possibilities_test
 
@@ -67,6 +67,19 @@ def get_tree_decision(clf, possible_choices):
     possible_choices_list = [possible_choices]
     decision_list = clf.predict(possible_choices_list)
     return decision_list[0]
+
+
+def train_linear_regression(X_train, y_train):
+    regr = linear_model.LinearRegression()
+    regr.fit(X_train, y_train)
+    return regr
+
+
+def get_linear_regression_decision(regr, X_test, y_test):
+    decision = regr.predict(X_test)
+    for (dec, y) in zip(decision, y_test):
+        print(str(dec) + " " + str(y))
+    return decision
 
 
 def write_tree_output_to_file(choices_test, decisions):
@@ -203,13 +216,13 @@ def create_dataset(grid, solution, position):
                      [position[0], position[1] + 1]]
         temp = ['', '', '', '', '']
         if i == 'LH' or i == 'L':
-            temp[0] = 'L'
+            temp[0] = '6'
         if i == 'UH' or i == 'U':
-            temp[0] = 'U'
+            temp[0] = '7'
         if i == 'RH' or i == 'R':
-            temp[0] = 'R'
+            temp[0] = '8'
         if i == 'DH' or i == 'D':
-            temp[0] = 'D'
+            temp[0] = '9'
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
                 temp[j+1] = '0'

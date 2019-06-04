@@ -1,16 +1,27 @@
 import sys
 from random import randrange
+import numpy as np
 
 import pygame
 from pygame.locals import *
+from sklearn.model_selection import train_test_split
 
-from helpers import create_dataset
+from helpers import create_dataset, train_linear_regression, get_linear_regression_decision
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
     get_data_tree_from_file, train_decision_tree
 
+#decision tree
 choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
 clf = train_decision_tree(choices_train, possibilities_train)
+
+#linear regression
+X = np.asarray(possibilities_train)
+y = choices_train
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=0)
+regr = train_linear_regression(X_train, y_train)
+decision = get_linear_regression_decision(regr, X_test, y_test)
+
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
 
