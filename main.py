@@ -7,10 +7,10 @@ from pygame.locals import *
 from helpers import create_dataset
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
-    get_data_tree_from_file, train_decision_tree
+    get_data_tree_from_file, train_decision_tree, decision_tree_move
 
-choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
-clf = train_decision_tree(choices_train, possibilities_train)
+# choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
+# clf = train_decision_tree(choices_train, possibilities_train)
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
 
@@ -62,6 +62,8 @@ while x == 0:
 
         solution = solution[index]
         create_dataset(grid, solution, position)
+        # solution = decision_tree_move(grid, position, clf)
+        print(solution)
         while solution:
             display_text(myfont, DISPLAYSURF,
                          f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600,

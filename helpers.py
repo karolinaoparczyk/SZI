@@ -69,6 +69,37 @@ def get_tree_decision(clf, possible_choices):
     return decision_list[0]
 
 
+def decision_tree_move(grid, position, clf):
+    solution = []
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    move = ['L', 'U', 'R', 'D']
+
+    for i in range(1000):
+        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
+                     [position[0], position[1] + 1]]
+        possible_moves = ['', '', '', '']
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                possible_moves[j] = '0'
+            if grid[positions[j][0]][positions[j][1]].type == 'road':
+                possible_moves[j] = '1'
+            if grid[positions[j][0]][positions[j][1]].type == 'house':
+                possible_moves[j] = '2'
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                possible_moves[j] = '3'
+
+        tree_move = get_tree_decision(clf, possible_moves)
+        for j in range(len(move)):
+            if tree_move == move[j]:
+                if grid[positions[j][0]][positions[j][1]].type == 'house':
+                    solution.append(house_move[j])
+                if grid[positions[j][0]][positions[j][1]].type == 'road':
+                    solution.append(move[j])
+                    position = positions[j]
+
+    return solution
+
+
 def write_tree_output_to_file(choices_test, decisions):
     with open(f'decision_tree_output.txt', 'w') as data:
         for (choice_test, decision) in zip(choices_test, decisions):
@@ -199,30 +230,44 @@ def create_dataset(grid, solution, position):
     for i in solution:
         if i == 'test':
             continue
-        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
-                     [position[0], position[1] + 1]]
-        temp = ['', '', '', '', '']
+
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        temp = []
         if i == 'LH' or i == 'L':
-            temp[0] = 'L'
+            temp.append('L')
         if i == 'UH' or i == 'U':
-            temp[0] = 'U'
+            temp.append('U')
         if i == 'RH' or i == 'R':
-            temp[0] = 'R'
+            temp.append('R')
         if i == 'DH' or i == 'D':
-            temp[0] = 'D'
+            temp.append('D')
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
-                temp[j+1] = '0'
+                temp.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'road':
-                temp[j+1] = '1'
+                temp.append('1')
             if grid[positions[j][0]][positions[j][1]].type == 'house':
-                temp[j+1] = '2'
+                temp.append('2')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
-                temp[j+1] = '3'
-        f.write(f"{temp[0]}, {temp[1]}, {temp[2]}, {temp[3]}, {temp[4]}\n")
+                temp.append('3')
+        temp = ', '.join(temp)
+        f.write(f'{temp}\n')
         for j in range(len(move)):
             if move[j] == i:
-                position = positions[j]
+                position = positions_for_move[j]
     f.close()
 
 # vowpal_wabbit
