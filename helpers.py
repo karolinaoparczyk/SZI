@@ -31,13 +31,12 @@ def get_map(number):
 # possibilities[2] - right
 # possibilities[3] - down
 
-
 def get_data_tree_from_file():
     choices_train = []
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 100
+    i = 3800
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -85,12 +84,14 @@ def get_linear_regression_decision(regr, X_test, y_test):
 
 def decision_tree_move(grid, position, clf):
     solution = []
+    visited_houses = []
     house_move = ['LH', 'UH', 'RH', 'DH']
     move = ['L', 'U', 'R', 'D']
     move_id = ['6', '7', '8', '9']
-    positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
 
     for i in range(1000):
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
         positions = []
         e = -2
         for q in range(5):
@@ -117,8 +118,9 @@ def decision_tree_move(grid, position, clf):
         tree_move = get_tree_decision(clf, possible_moves)
         for j in range(len(move)):
             if int(tree_move) == int(move_id[j]):
-                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
+                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house' and positions_for_move[j] not in visited_houses:
                     solution.append(house_move[j])
+                    visited_houses.append(positions_for_move[j])
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
                     solution.append(move[j])
                     position = positions_for_move[j]
