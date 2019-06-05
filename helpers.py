@@ -36,7 +36,7 @@ def get_data_tree_from_file():
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 3800
+    i = 2000
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -110,15 +110,18 @@ def decision_tree_move(grid, position, clf):
                 possible_moves.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'road':
                 possible_moves.append('1')
-            if grid[positions[j][0]][positions[j][1]].type == 'house':
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                possible_moves.append('4')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
                 possible_moves.append('2')
+                visited_houses.append(positions[j])
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 possible_moves.append('3')
 
         tree_move = get_tree_decision(clf, possible_moves)
         for j in range(len(move)):
             if int(tree_move) == int(move_id[j]):
-                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house' and positions_for_move[j] not in visited_houses:
+                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
                     solution.append(house_move[j])
                     visited_houses.append(positions_for_move[j])
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
@@ -255,6 +258,7 @@ def check_solutions(count):
 def create_dataset(grid, solution, position):
     f = open('dataset.txt', 'a')
     move = ['L', 'U', 'R', 'D']
+    visited_houses = []
     for i in solution:
         if i == 'test':
             continue
@@ -287,8 +291,11 @@ def create_dataset(grid, solution, position):
                 temp.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'road':
                 temp.append('1')
-            if grid[positions[j][0]][positions[j][1]].type == 'house':
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                temp.append('4')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
                 temp.append('2')
+                visited_houses.append(positions[j])
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 temp.append('3')
         temp = ', '.join(temp)
