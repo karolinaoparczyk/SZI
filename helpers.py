@@ -1,7 +1,7 @@
 import re
 import random
 import sys
-from sklearn import tree
+from sklearn import tree, linear_model
 
 from models.area import Area
 from models.garbage_collector import *
@@ -22,17 +22,6 @@ def get_map(number):
             columns.append(line.split(";"))
         return columns
 
-
-def generate_sample_data():
-    moves = ["L", "U", "R", "D"]
-    areas = [0, 1, 2, 3]
-    with open(f'data.txt', 'w') as data:
-        for i in range(120):
-            line = str(random.choice(moves)) + "," + str(random.choice(areas)) + "," + str(random.choice(areas)) + "," + \
-                   str(random.choice(areas)) + "," + str(random.choice(areas)) + "\n"
-            data.write(str(line))
-
-
 # 0 - grass
 # 1 - road
 # 2 - house
@@ -51,32 +40,83 @@ def get_data_tree_from_file():
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
-                choice = line[0]
+                choice = int(line[0])
                 choices_train.append(choice)
-                moves = line[2:-1].split(",") #na końcu usuwamy znak nowej lini /n
+                moves = list(map(int, line[2:-1].split(","))) #na końcu usuwamy znak nowej lini /n
                 possibilities_train.append(moves)
                 i -= 1
             else:
-                choice = line[0]
+                choice = int(line[0])
                 choices_test.append(choice)
-                moves = line[2:-1].split(",")  # na końcu usuwamy znak nowej lini /n
+                moves = list(map(int, line[2:-1].split(",")))  # na końcu usuwamy znak nowej lini /n
                 possibilities_test.append(moves)
     return choices_train, choices_test, possibilities_train, possibilities_test
 
 
-def train_decision_tree(choices_train, choices_test, possibilities_train, possibilities_test):
+def train_decision_tree(choices_train, possibilities_train):
     clf = tree.DecisionTreeClassifier()
-
     clf = clf.fit(possibilities_train, choices_train)
-
-    decisions = clf.predict(possibilities_test)
-    write_tree_output_to_file(choices_test, decisions)
+    return clf
 
 
-def write_tree_output_to_file(choices_test, decisions):
-    with open(f'decision_tree_output.txt', 'w') as data:
-        for (choice_test, decision) in zip(choices_test, decisions):
-            data.write(str(choice_test) + ',' + str(decision) + '\n')
+# possible_choices = [ , , , ]
+# possible_choices_list = [[ , , , ]]
+
+
+def get_tree_decision(clf, possibilities_test, choices_test):
+    decision_list = clf.predict(possibilities_test)
+    write_output_to_file(choices_test, decision_list, "decision_tree_output")
+    return decision_list[0]
+
+
+def train_linear_regression(X_train, y_train):
+    regr = linear_model.LinearRegression()
+    regr.fit(X_train, y_train)
+    return regr
+
+
+def get_linear_regression_decision(regr, X_test, y_test):
+    decision = regr.predict(X_test)
+    write_output_to_file(y_test, decision, "linear_regression_output")
+    return decision
+
+
+def decision_tree_move(grid, position, clf):
+    solution = []
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    move = ['L', 'U', 'R', 'D']
+
+    for i in range(1000):
+        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
+                     [position[0], position[1] + 1]]
+        possible_moves = ['', '', '', '']
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                possible_moves[j] = '0'
+            if grid[positions[j][0]][positions[j][1]].type == 'road':
+                possible_moves[j] = '1'
+            if grid[positions[j][0]][positions[j][1]].type == 'house':
+                possible_moves[j] = '2'
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                possible_moves[j] = '3'
+
+        tree_move = get_tree_decision(clf, possible_moves)
+        for j in range(len(move)):
+            if tree_move == move[j]:
+                if grid[positions[j][0]][positions[j][1]].type == 'house':
+                    solution.append(house_move[j])
+                if grid[positions[j][0]][positions[j][1]].type == 'road':
+                    solution.append(move[j])
+                    position = positions[j]
+
+    return solution
+
+
+def write_output_to_file(expected_choices, decisions, filename):
+    with open('{}.txt'.format(filename), 'w') as data:
+        data.write("expected_choice, decision \n")
+        for (choice, decision) in zip(expected_choices, decisions):
+            data.write(str(choice) + ',' + str(decision) + '\n')
 
 
 def create_grid(map):
@@ -203,52 +243,45 @@ def create_dataset(grid, solution, position):
     for i in solution:
         if i == 'test':
             continue
-        positions = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]],
-                     [position[0], position[1] + 1]]
-        temp = ['', '', '', '', '']
+
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        temp = []
         if i == 'LH' or i == 'L':
-            temp[0] = 'L'
+            temp.append('6')
         if i == 'UH' or i == 'U':
-            temp[0] = 'U'
+            temp.append('7')
         if i == 'RH' or i == 'R':
-            temp[0] = 'R'
+            temp.append('8')
         if i == 'DH' or i == 'D':
-            temp[0] = 'D'
+            temp.append('9')
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
-                temp[j+1] = '0'
+                temp.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'road':
-                temp[j+1] = '1'
+                temp.append('1')
             if grid[positions[j][0]][positions[j][1]].type == 'house':
-                temp[j+1] = '2'
+                temp.append('2')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
-                temp[j+1] = '3'
-        f.write(f"{temp[0]}, {temp[1]}, {temp[2]}, {temp[3]}, {temp[4]}\n")
+                temp.append('3')
+        temp = ', '.join(temp)
+        f.write(f'{temp}\n')
         for j in range(len(move)):
             if move[j] == i:
-                position = positions[j]
+                position = positions_for_move[j]
     f.close()
-
-    # DFS
-# rekurencją
-# węzłem drzewa konkrenta sytuacja na planszy
-# gałęziamy (możliwościami) jest to wszystko, co może zrobic agent
-# zasada: nie powtarzamy ostatniej operacji
-# jak może coś odwiedzić (zebrać śmieci), to niech to zrobi
-# ucinanie ścieżki, jeśli robi zbyt dużo operacji (zapętlenie)
-
-# przyjmuje ciąd dotyczhczasowych operacji
-# dfs_find(GRID, CURRENT_OPERATIONS)
-# 1. sprawdź czy koniec (czy zadanie zostało wykonane/czy wszystkie punkty zostały wykonane)
-# a) TAK
-#   ..globalna SOLUTIONS = []..
-#   SOLUTIONS.append(current_operations)
-# b) NIE
-#   Sprawdź możliwości
-#   ..operacje na gridie.. funkcja dodatkowa - przyjmuje grida i operację, zwraca zmienionego grida
-#   .. zwiększamy liste operacji..
-#   dfs_find(zmieniony grid, zwiekszona lista operacji)
-
 
 # vowpal_wabbit
 # getting started/dependencies/building/installing/tutorial
