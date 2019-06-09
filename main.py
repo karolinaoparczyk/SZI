@@ -1,6 +1,7 @@
 import sys
 from random import randrange
 import numpy as np
+import os
 
 import pygame
 from pygame.locals import *
@@ -26,7 +27,7 @@ decision = get_linear_regression_decision_test(regr, X_test, y_test)
 
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
-
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
 
 FPS = 59
