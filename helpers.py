@@ -36,7 +36,7 @@ def get_data_tree_from_file():
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 2000
+    i = 4000
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -104,6 +104,7 @@ def decision_tree_move(grid, position, clf, regr):
     house_move = ['LH', 'UH', 'RH', 'DH']
     move = ['L', 'U', 'R', 'D']
     move_id = ['6', '7', '8', '9']
+    last_position = []
 
     for i in range(1000):
         positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
@@ -144,6 +145,11 @@ def decision_tree_move(grid, position, clf, regr):
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
                     solution.append(move[j])
                     position = positions_for_move[j]
+                    if len(solution) >= 4:
+                        if solution[-1] == solution[-3] and solution[-2] == solution[-4] and solution[-1] != solution[-2]:
+                            solution[-1] = solution[-2]
+                            position = last_position
+                    last_position = positions_for_move[j]
 
     return solution
 
