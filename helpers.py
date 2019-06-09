@@ -62,11 +62,19 @@ def train_decision_tree(choices_train, possibilities_train):
 
 # possible_choices = [ , , , ]
 # possible_choices_list = [[ , , , ]]
+# decision_list[0] = []
 
 
+#to dataset from map
 def get_tree_decision(clf, possible_choices):
     possible_choices_list = [possible_choices]
     decision_list = clf.predict(possible_choices_list)
+    return decision_list[0]
+
+#to dataset from dfs
+def get_tree_decision_test(clf, possible_choices, expected_choices):
+    decision_list = clf.predict(possible_choices)
+    write_tree_output_to_file(expected_choices, decision_list, 'decision_tree_output')
     return decision_list[0]
 
 
@@ -75,15 +83,23 @@ def train_linear_regression(X_train, y_train):
     regr.fit(X_train, y_train)
     return regr
 
-
-def get_linear_regression_decision(regr, X_test, y_test):
-    decision = regr.predict(X_test)
-    for (dec, y) in zip(decision, y_test):
-        print(str(dec) + " " + str(y))
+# possible_choices_list [[ , , , ]]
+# decision []
+#to dataset from map
+def get_linear_regression_decision(regr, possible_choices):
+    possible_choices_list = [possible_choices]
+    decision = regr.predict(possible_choices_list)
     return decision
 
 
-def decision_tree_move(grid, position, clf, count, regr, X_test, y_test):
+#to dataset from dfs
+def get_linear_regression_decision_test(regr, possible_choices, expected_choices):
+    decisions = regr.predict(possible_choices)
+    write_tree_output_to_file(expected_choices, decisions, 'linear_regression_output')
+    return decisions
+
+
+def decision_tree_move(grid, position, clf, regr):
     solution = []
     visited_houses = []
     house_move = ['LH', 'UH', 'RH', 'DH']
@@ -121,8 +137,8 @@ def decision_tree_move(grid, position, clf, count, regr, X_test, y_test):
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 possible_moves.append('3')
 
-        tree_move = get_linear_regression_decision(regr, X_test, y_test)
-        print(tree_move)
+        tree_move = get_tree_decision(clf, possible_moves)
+        # linear_regression_move = get_linear_regression_decision(regr, list(map(int, possible_moves)))
         for j in range(len(move)):
             if int(tree_move) == int(move_id[j]):
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
@@ -139,9 +155,10 @@ def decision_tree_move(grid, position, clf, count, regr, X_test, y_test):
     return solution
 
 
-def write_tree_output_to_file(choices_test, decisions):
-    with open(f'decision_tree_output.txt', 'w') as data:
-        for (choice_test, decision) in zip(choices_test, decisions):
+def write_tree_output_to_file(expected_choices, decisions, filename):
+    with open('{}.txt'.format(filename), 'w') as data:
+        data.write('expected_choice, decision\n')
+        for (choice_test, decision) in zip(expected_choices, decisions):
             data.write(str(choice_test) + ',' + str(decision) + '\n')
 
 
