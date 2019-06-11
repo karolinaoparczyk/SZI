@@ -38,7 +38,7 @@ DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
 
-grid = create_grid(get_map(randrange(1, 45)))
+grid = create_grid(get_map(75))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
@@ -60,25 +60,25 @@ while x == 0:
             sys.exit()
         position = garbage_collector.position
         # START of DFS
-        # visited_houses = []
-        # counter = 0
-        # solution = ['test']
-        # temp = 'start'
-        # count = find_houses(grid)
-        # dfs_move(grid, position, visited_houses, counter, solution, count, temp)
-        # check_solutions(count)
-        #
-        # solution = solutions
-        # find = 30000
-        # for i in range(len(solution)):
-        #     if len(solution[i]) < find:
-        #         find = len(solution[i])
-        #         index = i
-        #
-        # solution = solution[index]
-        # create_dataset(grid, solution, position)
+        visited_houses = []
+        counter = 0
+        solution = ['test']
+        temp = 'start'
+        count = find_houses(grid)
+        dfs_move(grid, position, visited_houses, counter, solution, count, temp)
+        check_solutions(count)
+
+        solution = solutions
+        find = 30000
+        for i in range(len(solution)):
+            if len(solution[i]) < find:
+                find = len(solution[i])
+                index = i
+
+        solution = solution[index]
+        create_dataset(grid, solution, position)
         # END of DFS
-        solution = decision_tree_move(grid, position, clf, regr)
+        # solution = decision_tree_move(grid, position, clf, regr)
         print(solution)
         while solution:
             display_text(myfont, DISPLAYSURF,
