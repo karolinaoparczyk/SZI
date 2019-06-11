@@ -37,7 +37,7 @@ def get_data_tree_from_file():
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 4500
+    i = 5600
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -71,6 +71,7 @@ def get_tree_decision(clf, possible_choices):
     decision_list = clf.predict(possible_choices_list)
     return decision_list[0]
 
+
 #to dataset from dfs
 def get_tree_decision_test(clf, possible_choices, expected_choices):
     decision_list = clf.predict(possible_choices)
@@ -82,6 +83,7 @@ def train_linear_regression(X_train, y_train):
     regr = linear_model.LinearRegression()
     regr.fit(X_train, y_train)
     return regr
+
 
 # possible_choices_list [[ , , , ]]
 # decision []
@@ -99,7 +101,7 @@ def get_linear_regression_decision_test(regr, possible_choices, expected_choices
     return decisions
 
 
-def decision_tree_move(grid, position, clf, regr):
+def decision_tree_move(grid, position, clf, regr, count):
     solution = []
     visited_houses = []
     house_move = ['LH', 'UH', 'RH', 'DH']
@@ -213,6 +215,7 @@ def color_grid(grid):
     garbage_collector = GarbageCollector(45000, grid, garbage_collector_position)
     all_sprites_list.add(garbage_collector)
     return all_sprites_list, garbage_collector, houses
+
 
 solutions = []
 

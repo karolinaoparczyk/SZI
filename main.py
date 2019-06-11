@@ -16,7 +16,7 @@ from helpers import get_map, display_text, create_grid, color_grid, dfs_move, fi
 #decision tree
 choices_train, choices_test, possibilities_train, possibilities_test = get_data_tree_from_file()
 clf = train_decision_tree(choices_train, possibilities_train)
-get_tree_decision_test(clf, possibilities_test, choices_test)
+# get_tree_decision_test(clf, possibilities_test, choices_test)
 
 #linear regression
 X = np.asarray(possibilities_train)
@@ -78,7 +78,7 @@ while x == 0:
         # solution = solution[index]
         # create_dataset(grid, solution, position)
         # END of DFS
-        solution = decision_tree_move(grid, position, clf, regr)
+        solution = decision_tree_move(grid, position, clf, regr, count)
         print(solution)
         while solution:
             display_text(myfont, DISPLAYSURF,
