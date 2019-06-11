@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from helpers import create_dataset, train_linear_regression, get_linear_regression_decision_test
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
-    get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test
+    get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test, bfs_move
 
 
 #decision tree
@@ -37,8 +37,9 @@ WINDOW_SIZE = (900, 900)
 DISPLAYSURF = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption('Inteligentna śmieciarka')
 background_image = pygame.image.load("images/road_big.jpg")
-
-grid = create_grid(get_map(randrange(1, 45)))
+temp = randrange(1, 70)
+print(temp)
+grid = create_grid(get_map(temp))
 all_sprites_list, garbage_collector, houses = color_grid(grid)
 
 garbage_amount = 0
@@ -78,7 +79,8 @@ while x == 0:
         # solution = solution[index]
         # create_dataset(grid, solution, position)
         # END of DFS
-        solution = decision_tree_move(grid, position, clf, regr, count)
+        # solution = decision_tree_move(grid, position, clf, regr, count)
+        solution = bfs_move(grid, position, count)
         print(solution)
         while solution:
             display_text(myfont, DISPLAYSURF,
