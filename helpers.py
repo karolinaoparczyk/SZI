@@ -37,7 +37,7 @@ def get_data_tree_from_file():
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 5600
+    i = 9000
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -79,8 +79,9 @@ def get_tree_decision_test(clf, possible_choices, expected_choices):
     return decision_list[0]
 
 
-def train_linear_regression(X_train, y_train):
-    regr = linear_model.LinearRegression()
+def train_logistic_regression(X_train, y_train):
+    regr = linear_model.LogisticRegression(solver='liblinear', multi_class='auto', max_iter=100000,
+                                           class_weight='balanced')
     regr.fit(X_train, y_train)
     return regr
 
@@ -88,20 +89,20 @@ def train_linear_regression(X_train, y_train):
 # possible_choices_list [[ , , , ]]
 # decision []
 #to dataset from map
-def get_linear_regression_decision(regr, possible_choices):
+def get_logistic_regression_decision(regr, possible_choices):
     possible_choices_list = [possible_choices]
     decision = regr.predict(possible_choices_list)
-    return decision
+    return decision[0]
 
 
 #to dataset from dfs
-def get_linear_regression_decision_test(regr, possible_choices, expected_choices):
+def get_logistic_regression_decision_test(regr, possible_choices, expected_choices):
     decisions = regr.predict(possible_choices)
     write_tree_output_to_file(expected_choices, decisions, 'linear_regression_output')
     return decisions
 
 
-def decision_tree_move(grid, position, clf, regr, count):
+def a_i_move(grid, position, clf, regr, count):
     solution = []
     visited_houses = []
     house_move = ['LH', 'UH', 'RH', 'DH']
@@ -135,23 +136,29 @@ def decision_tree_move(grid, position, clf, regr, count):
             if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
                 possible_moves.append('2')
             if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
-                possible_moves.append('4')
+                possible_moves.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 possible_moves.append('3')
 
-        tree_move = get_tree_decision(clf, possible_moves)
-        # linear_regression_move = get_linear_regression_decision(regr, list(map(int, possible_moves)))
-        for j in range(len(move)):
-            if int(tree_move) == int(move_id[j]):
-                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
-                    if positions_for_move[j] not in visited_houses:
-                        count -= 1
-                    solution.append(house_move[j])
-                    visited_houses.append(positions_for_move[j])
-                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
-                    last_position = position
-                    solution.append(move[j])
-                    position = positions_for_move[j]
+        # ai_move = get_tree_decision(clf, possible_moves)
+        ai_move = get_logistic_regression_decision(regr, list(map(int, possible_moves)))
+        check = 0
+        while check == 0:
+            for j in range(len(move)):
+                if int(round(ai_move)) == int(move_id[j]):
+                    if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
+                        if positions_for_move[j] not in visited_houses:
+                            count -= 1
+                        solution.append(house_move[j])
+                        last_position = position
+                        visited_houses.append(positions_for_move[j])
+                        check = 1
+                    if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
+                        last_position = position
+                        solution.append(move[j])
+                        position = positions_for_move[j]
+                        check = 1
+            ai_move = random.randint(6, 9)
         if count == 0:
             return solution
     return solution
