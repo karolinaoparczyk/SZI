@@ -31,12 +31,13 @@ def get_map(number):
 # possibilities[2] - right
 # possibilities[3] - down
 
+
 def get_data_tree_from_file():
     choices_train = []
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 4000
+    i = 5600
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -70,6 +71,7 @@ def get_tree_decision(clf, possible_choices):
     decision_list = clf.predict(possible_choices_list)
     return decision_list[0]
 
+
 #to dataset from dfs
 def get_tree_decision_test(clf, possible_choices, expected_choices):
     decision_list = clf.predict(possible_choices)
@@ -81,6 +83,7 @@ def train_linear_regression(X_train, y_train):
     regr = linear_model.LinearRegression()
     regr.fit(X_train, y_train)
     return regr
+
 
 # possible_choices_list [[ , , , ]]
 # decision []
@@ -98,13 +101,13 @@ def get_linear_regression_decision_test(regr, possible_choices, expected_choices
     return decisions
 
 
-def decision_tree_move(grid, position, clf, regr):
+def decision_tree_move(grid, position, clf, regr, count):
     solution = []
     visited_houses = []
     house_move = ['LH', 'UH', 'RH', 'DH']
     move = ['L', 'U', 'R', 'D']
     move_id = ['6', '7', '8', '9']
-    last_position = []
+    last_position = position
 
     for i in range(1000):
         positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
@@ -125,32 +128,32 @@ def decision_tree_move(grid, position, clf, regr):
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
                 possible_moves.append('0')
-            if grid[positions[j][0]][positions[j][1]].type == 'road':
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] != last_position:
                 possible_moves.append('1')
-            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
-                possible_moves.append('4')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] == last_position:
+                possible_moves.append('5')
             if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
                 possible_moves.append('2')
-                visited_houses.append(positions[j])
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                possible_moves.append('4')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 possible_moves.append('3')
 
         tree_move = get_tree_decision(clf, possible_moves)
-        #linear_regression_move = get_linear_regression_decision(regr, list(map(int, possible_moves)))
+        # linear_regression_move = get_linear_regression_decision(regr, list(map(int, possible_moves)))
         for j in range(len(move)):
             if int(tree_move) == int(move_id[j]):
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
+                    if positions_for_move[j] not in visited_houses:
+                        count -= 1
                     solution.append(house_move[j])
                     visited_houses.append(positions_for_move[j])
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
+                    last_position = position
                     solution.append(move[j])
                     position = positions_for_move[j]
-                    if len(solution) >= 4:
-                        if solution[-1] == solution[-3] and solution[-2] == solution[-4] and solution[-1] != solution[-2]:
-                            solution[-1] = solution[-2]
-                            position = last_position
-                    last_position = positions_for_move[j]
-
+        if count == 0:
+            return solution
     return solution
 
 
@@ -212,6 +215,7 @@ def color_grid(grid):
     garbage_collector = GarbageCollector(45000, grid, garbage_collector_position)
     all_sprites_list.add(garbage_collector)
     return all_sprites_list, garbage_collector, houses
+
 
 solutions = []
 
@@ -282,7 +286,9 @@ def check_solutions(count):
 def create_dataset(grid, solution, position):
     f = open('dataset.txt', 'a')
     move = ['L', 'U', 'R', 'D']
+    house_move = ['LH', 'UH', 'RH', 'DH']
     visited_houses = []
+    last_position = position
     for i in solution:
         if i == 'test':
             continue
@@ -313,20 +319,24 @@ def create_dataset(grid, solution, position):
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
                 temp.append('0')
-            if grid[positions[j][0]][positions[j][1]].type == 'road':
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] != last_position:
                 temp.append('1')
-            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
-                temp.append('4')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] == last_position:
+                temp.append('5')
             if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
                 temp.append('2')
-                visited_houses.append(positions[j])
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                temp.append('4')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 temp.append('3')
         temp = ', '.join(temp)
         f.write(f'{temp}\n')
         for j in range(len(move)):
             if move[j] == i:
+                last_position = position
                 position = positions_for_move[j]
+            if house_move[j] == i:
+                visited_houses.append(positions_for_move[j])
     f.close()
 
 # vowpal_wabbit
