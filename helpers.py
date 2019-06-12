@@ -1,7 +1,9 @@
 import re
 import random
 import sys
+import os
 from sklearn import tree, linear_model
+from sklearn.preprocessing import StandardScaler
 
 from models.area import Area
 from models.garbage_collector import *
@@ -88,7 +90,7 @@ def train_linear_regression(X_train, y_train):
 # possible_choices_list [[ , , , ]]
 # decision []
 #to dataset from map
-def get_linear_regression_decision(regr, possible_choices):
+def get_logistic_regression_decision(regr, possible_choices):
     possible_choices_list = [possible_choices]
     decision = regr.predict(possible_choices_list)
     return decision
@@ -101,7 +103,7 @@ def get_linear_regression_decision_test(regr, possible_choices, expected_choices
     return decisions
 
 
-def decision_tree_move(grid, position, clf, regr, count):
+def a_i_move(grid, position, clf, regr, count):
     solution = []
     visited_houses = []
     house_move = ['LH', 'UH', 'RH', 'DH']
@@ -144,24 +146,89 @@ def decision_tree_move(grid, position, clf, regr, count):
             if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
                 possible_moves.append('2')
             if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
-                possible_moves.append('4')
+                possible_moves.append('0')
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 possible_moves.append('3')
 
-        tree_move = get_tree_decision(clf, possible_moves)
-        # linear_regression_move = get_linear_regression_decision(regr, list(map(int, possible_moves)))
-        for j in range(len(move)):
-            if int(tree_move) == int(move_id[j]):
-                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
-                    if positions_for_move[j] not in visited_houses:
-                        count -= 1
-                    solution.append(house_move[j])
-                    last_position = position
-                    visited_houses.append(positions_for_move[j])
-                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
-                    last_position = position
-                    solution.append(move[j])
-                    position = positions_for_move[j]
+        ai_move = get_tree_decision(clf, possible_moves)
+        check = 0
+        while check == 0:
+            for j in range(len(move)):
+                if int(round(ai_move)) == int(move_id[j]):
+                    if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
+                        if positions_for_move[j] not in visited_houses:
+                            count -= 1
+                        solution.append(house_move[j])
+                        last_position = position
+                        visited_houses.append(positions_for_move[j])
+                        check = 1
+                    if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
+                        last_position = position
+                        solution.append(move[j])
+                        position = positions_for_move[j]
+                        check = 1
+            ai_move = random.randint(6, 9)
+        if count == 0:
+            return solution
+    return solution
+
+def logistic_regression_move(grid, position, regr, count):
+    solution = []
+    visited_houses = []
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    move = ['L', 'U', 'R', 'D']
+    move_id = ['6', '7', '8', '9']
+    last_position = position
+
+    for i in range(1000):
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        possible_moves = []
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                possible_moves.append('0')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] != last_position:
+                possible_moves.append('1')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] == last_position:
+                possible_moves.append('5')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
+                possible_moves.append('2')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                possible_moves.append('0')
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                possible_moves.append('3')
+
+        for i in range(4):
+            if grid[positions_for_move[i][0]][positions_for_move[i][1]].type == 'house' \
+                    and positions_for_move[i] not in visited_houses:
+                solution.append(house_move[i])
+                visited_houses.append(positions_for_move[i])
+                last_position = position
+                count -= 1
+
+        ai_move = get_logistic_regression_decision(regr, list(map(int, possible_moves)))
+        check = 0
+        while check == 0:
+            for j in range(len(move)):
+                if int(ai_move) == int(move_id[j]):
+                    if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
+                        last_position = position
+                        solution.append(move[j])
+                        position = positions_for_move[j]
+                        check = 1
+            ai_move = random.randint(6, 9)
         if count == 0:
             return solution
     return solution
@@ -379,6 +446,177 @@ def create_dataset(grid, solution, position, dataset_by):
             if house_move[j] == i:
                 visited_houses.append(positions_for_move[j])
     f.close()
+
+
+def create_dataset_for_rabbit(grid, solution, position):
+    f = open('rabbit_dataset.txt', 'a')
+    move = ['L', 'U', 'R', 'D']
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    visited_houses = []
+    last_position = position
+    for i in solution:
+        if i == 'test':
+            continue
+
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1],
+                              [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        temp = []
+        if i == 'LH' or i == 'L':
+            temp.append('6')
+        if i == 'UH' or i == 'U':
+            temp.append('7')
+        if i == 'RH' or i == 'R':
+            temp.append('8')
+        if i == 'DH' or i == 'D':
+            temp.append('9')
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                temp.append('0')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] != last_position:
+                temp.append('20')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] == last_position:
+                temp.append('2')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
+                temp.append('35')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                temp.append('4')
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                temp.append('1')
+
+        s = ""
+        s = s + temp[0] + " | 1x1:." + temp[1] + " 1x2:." + temp[2]
+        s = s + " 1x3:." + temp[3] + " 1x4:." + temp[4]
+        s = s + " 1x5:." + temp[5]
+
+        s = s + " 2x1:." + temp[6] + " 2x2:." + temp[7]
+        s = s + " 2x3:." + temp[8] + " 2x4:." + temp[9]
+        s = s + " 2x5:." + temp[10]
+
+        s = s + " 3x1:." + temp[11] + " 3x2:." + temp[12]
+        s = s + " 3x4:." + temp[13] + " 3x5:." + temp[14]
+
+        s = s + " 4x1:." + temp[15] + " 4x2:." + temp[16]
+        s = s + " 4x3:." + temp[17] + " 4x4:." + temp[18]
+        s = s + " 4x5:." + temp[19]
+
+        s = s + " 5x1:." + temp[20] + " 5x2:." + temp[21]
+        s = s + " 5x3:." + temp[22] + " 5x4:." + temp[23]
+        s = s + " 5x5:." + temp[24]
+
+        f.write(f'{s}\n')
+
+        for j in range(len(move)):
+            if move[j] == i:
+                last_position = position
+                position = positions_for_move[j]
+            if house_move[j] == i:
+                visited_houses.append(positions_for_move[j])
+    f.close()
+
+
+def create_rabbit_model():
+    os.system('vw {} -c --passes 25 -f {}'.format(os.path.join('.', 'rabbit_dataset.txt'), os.path.join('.', 'rabbit.model')))
+
+
+def move_rabbit(grid, position, count):
+    solution = []
+    visited_houses = []
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    move = ['L', 'U', 'R', 'D']
+    move_id = ['6', '7', '8', '9']
+    last_position = position
+
+    for i in range(1000):
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1],
+                              [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        possible_moves = []
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                possible_moves.append('0')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] != last_position:
+                possible_moves.append('20')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] == last_position:
+                possible_moves.append('2')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
+                possible_moves.append('35')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                possible_moves.append('4')
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                possible_moves.append('1')
+
+        s = ""
+        s = s + " | 1x1:." + possible_moves[0][0] + " 1x2:." + possible_moves[1][0]
+        s = s + " 1x3:." + possible_moves[2][0] + " 1x4:." + possible_moves[3][0]
+        s = s + " 1x5:." + possible_moves[4][0]
+
+        s = s + " 2x1:." + possible_moves[5][0] + " 2x2:." + possible_moves[6][0]
+        s = s + " 2x3:." + possible_moves[7][0] + " 2x4:." + possible_moves[8][0]
+        s = s + " 2x5:." + possible_moves[9][0]
+
+        s = s + " 3x1:." + possible_moves[10][0] + " 3x2:." + possible_moves[11][0]
+        s = s + " 3x4:." + possible_moves[12][0] + " 3x5:." + possible_moves[13][0]
+
+        s = s + " 4x1:." + possible_moves[14][0] + " 4x2:." + possible_moves[15][0]
+        s = s + " 4x3:." + possible_moves[16][0] + " 4x4:." + possible_moves[17][0]
+        s = s + " 4x5:." + possible_moves[18][0]
+
+        s = s + " 5x1:." + possible_moves[19][0] + " 5x2:." + possible_moves[20][0]
+        s = s + " 5x3:." + possible_moves[21][0] + " 5x4:." + possible_moves[22][0]
+        s = s + " 5x5:." + possible_moves[23][0]
+
+        f = open('input.txt', 'w')
+        f.write(f'{s}')
+        f.close()
+
+        os.system('vw -i {} -t {} -p {} --quiet'.format(os.path.join('.', 'rabbit.model'),
+                                                        os.path.join('.', 'input.txt'), os.path.join('.', 'output.txt')))
+
+        with open('output.txt', 'r') as myfile:
+            rabbit_move = int(str(myfile.readline())[0])
+            print(f"{rabbit_move}")
+
+        # linear_regression_move = get_linear_regression_decision(regr, list(map(int, possible_moves)))
+        for j in range(len(move)):
+            if int(rabbit_move) == int(move_id[j]):
+                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'house':
+                    if positions_for_move[j] not in visited_houses:
+                        count -= 1
+                    solution.append(house_move[j])
+                    visited_houses.append(positions_for_move[j])
+                if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
+                    last_position = position
+                    solution.append(move[j])
+                    position = positions_for_move[j]
+        if count == 0:
+            return solution
+    return solution
+
 
 # vowpal_wabbit
 # getting started/dependencies/building/installing/tutorial

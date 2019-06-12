@@ -7,10 +7,11 @@ import pygame
 from pygame.locals import *
 from sklearn.model_selection import train_test_split
 
-from helpers import create_dataset, train_linear_regression, get_linear_regression_decision_test
+from helpers import create_dataset
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, \
-    get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test, bfs_move
+    get_data_tree_from_file, train_decision_tree, get_tree_decision_test, create_dataset_for_rabbit, \
+    create_rabbit_model, move_rabbit, bfs_move, a_i_move, train_linear_regression, get_linear_regression_decision_test
 
 
 #decision tree
@@ -20,8 +21,8 @@ clf = train_decision_tree(choices_train, possibilities_train)
 
 #linear regression
 X = np.asarray(possibilities_train)
-y = choices_train
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=0)
+y = np.asarray(choices_train)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 regr = train_linear_regression(X_train, y_train)
 decision = get_linear_regression_decision_test(regr, X_test, y_test)
 
@@ -76,11 +77,19 @@ while x == 0:
         #         index = i
         #
         # solution = solution[index]
+        # create_dataset_for_rabbit(grid, solution, position)
         # create_dataset(grid, solution, position)
         # END of DFS
-        # solution = decision_tree_move(grid, position, clf, regr, count)
+        # solution = logistic_regression_move(grid, position, regr, count)
+        solution = a_i_move(grid, position, clf, regr, count)
         solution = bfs_move(grid, position, count)
         print(solution)
+
+        create_rabbit_model()
+        os.system('vw -i {} -t {} -p {} --quiet'.format(os.path.join('.', 'rabbit.model'),
+                                                        os.path.join('.', 'input.txt'),
+                                                        os.path.join('.', 'output.txt')))
+
         while solution:
             display_text(myfont, DISPLAYSURF,
                          f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600,
