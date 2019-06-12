@@ -2,6 +2,7 @@ import re
 import random
 import sys
 from sklearn import tree, linear_model
+from sklearn.preprocessing import StandardScaler
 
 from models.area import Area
 from models.garbage_collector import *
@@ -80,8 +81,10 @@ def get_tree_decision_test(clf, possible_choices, expected_choices):
 
 
 def train_logistic_regression(X_train, y_train):
-    regr = linear_model.LogisticRegression(solver='liblinear', multi_class='auto', max_iter=100000,
-                                           class_weight='balanced')
+    sc_x = StandardScaler()
+    X_train = sc_x.fit_transform(X_train)
+    regr = linear_model.LogisticRegression(class_weight='balanced', multi_class='multinomial', solver='lbfgs', C=100.0,
+                                           random_state=0)
     regr.fit(X_train, y_train)
     return regr
 
@@ -140,8 +143,7 @@ def a_i_move(grid, position, clf, regr, count):
             if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
                 possible_moves.append('3')
 
-        # ai_move = get_tree_decision(clf, possible_moves)
-        ai_move = get_logistic_regression_decision(regr, list(map(int, possible_moves)))
+        ai_move = get_tree_decision(clf, possible_moves)
         check = 0
         while check == 0:
             for j in range(len(move)):
@@ -153,6 +155,67 @@ def a_i_move(grid, position, clf, regr, count):
                         last_position = position
                         visited_houses.append(positions_for_move[j])
                         check = 1
+                    if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
+                        last_position = position
+                        solution.append(move[j])
+                        position = positions_for_move[j]
+                        check = 1
+            ai_move = random.randint(6, 9)
+        if count == 0:
+            return solution
+    return solution
+
+def logistic_regression_move(grid, position, regr, count):
+    solution = []
+    visited_houses = []
+    house_move = ['LH', 'UH', 'RH', 'DH']
+    move = ['L', 'U', 'R', 'D']
+    move_id = ['6', '7', '8', '9']
+    last_position = position
+
+    for i in range(1000):
+        positions_for_move = [[position[0] - 1, position[1]], [position[0], position[1] - 1], [position[0] + 1, position[1]], [position[0], position[1] + 1]]
+
+        positions = []
+        e = -2
+        for q in range(5):
+            r = -2
+            for w in range(5):
+                if e == 0 and r == 0:
+                    r += 1
+                    continue
+                positions.append([position[0] + e, position[1] + r])
+                r += 1
+            e += 1
+
+        possible_moves = []
+        for j in range(len(positions)):
+            if grid[positions[j][0]][positions[j][1]].type == 'grass':
+                possible_moves.append('0')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] != last_position:
+                possible_moves.append('1')
+            if grid[positions[j][0]][positions[j][1]].type == 'road' and positions[j] == last_position:
+                possible_moves.append('5')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] not in visited_houses:
+                possible_moves.append('2')
+            if grid[positions[j][0]][positions[j][1]].type == 'house' and positions[j] in visited_houses:
+                possible_moves.append('0')
+            if grid[positions[j][0]][positions[j][1]].type == 'garbage_dump':
+                possible_moves.append('3')
+
+        for i in range(4):
+            if grid[positions_for_move[i][0]][positions_for_move[i][1]].type == 'house' \
+                    and positions_for_move[i] not in visited_houses:
+                solution.append(house_move[i])
+                visited_houses.append(positions_for_move[i])
+                last_position = position
+                count -= 1
+
+        ai_move = get_logistic_regression_decision(regr, list(map(int, possible_moves)))
+        check = 0
+        while check == 0:
+            for j in range(len(move)):
+                if int(ai_move) == int(move_id[j]):
                     if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
                         last_position = position
                         solution.append(move[j])

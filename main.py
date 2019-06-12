@@ -11,7 +11,7 @@ from helpers import create_dataset, train_logistic_regression, get_logistic_regr
     get_logistic_regression_decision
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
-    get_data_tree_from_file, train_decision_tree, a_i_move, get_tree_decision_test
+    get_data_tree_from_file, train_decision_tree, a_i_move, get_tree_decision_test, logistic_regression_move
 
 
 #decision tree
@@ -21,8 +21,8 @@ clf = train_decision_tree(choices_train, possibilities_train)
 
 #linear regression
 X = np.asarray(possibilities_train)
-y = choices_train
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=0)
+y = np.asarray(choices_train)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 regr = train_logistic_regression(X_train, y_train)
 decision = get_logistic_regression_decision_test(regr, X_test, y_test)
 
@@ -60,12 +60,12 @@ while x == 0:
             pygame.quit()
             sys.exit()
         position = garbage_collector.position
+        count = find_houses(grid)
         # START of DFS
         # visited_houses = []
         # counter = 0
         # solution = ['test']
         # temp = 'start'
-        # count = find_houses(grid)
         # dfs_move(grid, position, visited_houses, counter, solution, count, temp)
         # check_solutions(count)
         #
@@ -79,6 +79,7 @@ while x == 0:
         # solution = solution[index]
         # create_dataset(grid, solution, position)
         # END of DFS
+        # solution = logistic_regression_move(grid, position, regr, count)
         solution = a_i_move(grid, position, clf, regr, count)
         print(solution)
         while solution:
