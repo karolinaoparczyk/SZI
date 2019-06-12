@@ -38,7 +38,7 @@ def get_data_tree_from_file():
     choices_test = []
     possibilities_train = []
     possibilities_test = []
-    i = 9000
+    i = 5600
     with open(f'dataset.txt') as data:
         for line in data:
             if i > 0:
@@ -80,11 +80,8 @@ def get_tree_decision_test(clf, possible_choices, expected_choices):
     return decision_list[0]
 
 
-def train_logistic_regression(X_train, y_train):
-    sc_x = StandardScaler()
-    X_train = sc_x.fit_transform(X_train)
-    regr = linear_model.LogisticRegression(class_weight='balanced', multi_class='multinomial', solver='lbfgs', C=100.0,
-                                           random_state=0)
+def train_linear_regression(X_train, y_train):
+    regr = linear_model.LinearRegression()
     regr.fit(X_train, y_train)
     return regr
 
@@ -92,14 +89,14 @@ def train_logistic_regression(X_train, y_train):
 # possible_choices_list [[ , , , ]]
 # decision []
 #to dataset from map
-def get_logistic_regression_decision(regr, possible_choices):
+def get_linear_regression_decision(regr, possible_choices):
     possible_choices_list = [possible_choices]
     decision = regr.predict(possible_choices_list)
-    return decision[0]
+    return decision
 
 
 #to dataset from dfs
-def get_logistic_regression_decision_test(regr, possible_choices, expected_choices):
+def get_linear_regression_decision_test(regr, possible_choices, expected_choices):
     decisions = regr.predict(possible_choices)
     write_tree_output_to_file(expected_choices, decisions, 'linear_regression_output')
     return decisions
