@@ -90,7 +90,7 @@ def train_linear_regression(X_train, y_train):
 # possible_choices_list [[ , , , ]]
 # decision []
 #to dataset from map
-def get_linear_regression_decision(regr, possible_choices):
+def get_logistic_regression_decision(regr, possible_choices):
     possible_choices_list = [possible_choices]
     decision = regr.predict(possible_choices_list)
     return decision

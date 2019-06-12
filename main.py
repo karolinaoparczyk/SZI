@@ -7,11 +7,11 @@ import pygame
 from pygame.locals import *
 from sklearn.model_selection import train_test_split
 
-from helpers import create_dataset, train_linear_regression, get_linear_regression_decision_test
+from helpers import create_dataset
 
-from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
-    get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test, create_dataset_for_rabbit, \
-    create_rabbit_model, move_rabbit, bfs_move, a_i_move
+from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, \
+    get_data_tree_from_file, train_decision_tree, get_tree_decision_test, create_dataset_for_rabbit, \
+    create_rabbit_model, move_rabbit, bfs_move, a_i_move, train_linear_regression, get_linear_regression_decision_test
 
 
 #decision tree
@@ -23,8 +23,8 @@ clf = train_decision_tree(choices_train, possibilities_train)
 X = np.asarray(possibilities_train)
 y = np.asarray(choices_train)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-regr = train_logistic_regression(X_train, y_train)
-decision = get_logistic_regression_decision_test(regr, X_test, y_test)
+regr = train_linear_regression(X_train, y_train)
+decision = get_linear_regression_decision_test(regr, X_test, y_test)
 
 pygame.font.init()
 myfont = pygame.font.SysFont(None, 25)
