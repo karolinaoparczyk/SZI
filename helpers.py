@@ -125,6 +125,15 @@ def decision_tree_move(grid, position, clf, regr, count):
                 r += 1
             e += 1
 
+        check_possible_moves = 0
+        for w in range(len(positions_for_move)):
+            if (grid[positions_for_move[w][0]][positions_for_move[w][1]].type == 'road' and positions_for_move[w] != last_position) or (grid[positions_for_move[w][0]][positions_for_move[w][1]].type == 'house' and positions_for_move[w] not in visited_houses):
+                check_possible_moves += 1
+        if check_possible_moves == 0:
+            for w in range(len(positions_for_move)):
+                if grid[positions_for_move[w][0]][positions_for_move[w][1]].type == 'road' and positions_for_move[w] == last_position:
+                    last_position = position
+
         possible_moves = []
         for j in range(len(positions)):
             if grid[positions[j][0]][positions[j][1]].type == 'grass':
@@ -148,6 +157,7 @@ def decision_tree_move(grid, position, clf, regr, count):
                     if positions_for_move[j] not in visited_houses:
                         count -= 1
                     solution.append(house_move[j])
+                    last_position = position
                     visited_houses.append(positions_for_move[j])
                 if grid[positions_for_move[j][0]][positions_for_move[j][1]].type == 'road':
                     last_position = position
@@ -242,7 +252,6 @@ def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
         if count != 0:
             solution.pop()
             return 0
-        solutions.append(solution[:])
         return 0
     if count == 0:
         solutions.append(solution[:])
@@ -263,28 +272,60 @@ def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
             temp = move[i]
             dfs_move(grid, positions[i], visited_houses[:], counter, solution[:], count, temp)
 
-    for z in range(len(positions)):
-        if grid[positions[z][0]][positions[z][1]].type == 'garbage_dump':
-            solutions.append(solution[:])
-            return 0
-
     return 0
 
 
-def check_solutions(count):
+def bfs_move(grid, position, count):
     house_move = ['LH', 'UH', 'RH', 'DH']
-    temp = len(solutions) - 1
-    while temp >= 0:
-        counter = 0
-        for j in solutions[temp]:
-            if j in house_move:
-                counter += 1
-        if counter != count:
-            solutions.pop(temp)
-        temp -= 1
+    move = ['L', 'U', 'R', 'D']
+    last_move = ['R', 'D', 'L', 'U']
+    solution = [['test']]
+    remaining_houses = [count]
+    visited_houses = [[]]
+    bfs_position = [position]
+    counter = 1
+
+    while True:
+        for j in range(counter):
+            temp_solutions = []
+            positions = [[bfs_position[j][0] - 1, bfs_position[j][1]], [bfs_position[j][0], bfs_position[j][1] - 1], [bfs_position[j][0] + 1, bfs_position[j][1]], [bfs_position[j][0], bfs_position[j][1] + 1]]
+
+            for i in range(len(positions)):
+                if grid[positions[i][0]][positions[i][1]].type == 'house' and positions[i] not in visited_houses[j]:
+                    visited_houses[j].append(positions[i])
+                    solution[j].append(house_move[i])
+                    remaining_houses[j] -= 1
+
+            if remaining_houses[j] == 0:
+                return solution[j]
+
+            check = 0
+            for i in range(len(positions)):
+                if grid[positions[i][0]][positions[i][1]].type == 'road' and last_move[i] != solution[j][-1]:
+                    check += 1
+                    temp_solutions.append(move[i])
+
+            for i in range(check - 1):
+                remaining_houses.append(remaining_houses[j])
+                solution.append(solution[j][:])
+                bfs_position.append(bfs_position[j][:])
+                visited_houses.append(visited_houses[j][:])
+
+            for i in range(check):
+                if i == 0:
+                    solution[j].append(temp_solutions.pop(0))
+                    for q in range(len(positions)):
+                        if solution[j][-1] == move[q]:
+                            bfs_position[j] = positions[q]
+                else:
+                    solution[counter].append(temp_solutions.pop(0))
+                    for q in range(len(positions)):
+                        if solution[counter][-1] == move[q]:
+                            bfs_position[counter] = positions[q]
+                    counter += 1
 
 
-def create_dataset(grid, solution, position):
+def create_dataset(grid, solution, position, dataset_by):
     f = open('dataset.txt', 'a')
     move = ['L', 'U', 'R', 'D']
     house_move = ['LH', 'UH', 'RH', 'DH']
