@@ -2,33 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3ebb41fd-0177-4823-80f5-99b03d2c60cb" name="Default Changelist" comment="regression move">
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA46.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA47.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA48.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA49.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA50.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA51.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA52.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA53.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA54.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA55.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA56.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA57.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA58.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA59.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA60.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA61.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA62.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA63.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA64.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA65.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA66.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA67.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA68.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA69.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/maps/MAPA70.csv" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/helpers.py" afterPath="$PROJECT_DIR$/helpers.py" />
+      <change beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -76,7 +51,7 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
+            <state relative-caret-position="51">
               <caret line="71" column="30" lean-forward="false" selection-start-line="71" selection-start-column="30" selection-end-line="71" selection-end-column="30" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -98,8 +73,8 @@
       <file leaf-file-name="helpers.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-85">
-              <caret line="150" column="0" lean-forward="false" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
+            <state relative-caret-position="-68">
+              <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -378,7 +353,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>103</line>
+          <line>110</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
@@ -463,7 +438,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
+        <state relative-caret-position="51">
           <caret line="71" column="30" lean-forward="false" selection-start-line="71" selection-start-column="30" selection-end-line="71" selection-end-column="30" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
@@ -473,8 +448,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-85">
-          <caret line="150" column="0" lean-forward="false" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
+        <state relative-caret-position="-68">
+          <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
