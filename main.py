@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 
 from helpers import create_dataset, train_linear_regression, get_linear_regression_decision_test
 
-from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
+from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, \
     get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test, bfs_move
 
 
@@ -67,7 +67,6 @@ while x == 0:
         # solution = ['test']
         # temp = 'start'
         # dfs_move(grid, position, visited_houses, counter, solution, count, temp)
-        # check_solutions(count)
         #
         # solution = solutions
         # find = 30000

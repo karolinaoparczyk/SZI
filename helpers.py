@@ -251,7 +251,6 @@ def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
         if count != 0:
             solution.pop()
             return 0
-        solutions.append(solution[:])
         return 0
     if count == 0:
         solutions.append(solution[:])
@@ -271,11 +270,6 @@ def dfs_move(grid, position, visited_houses, counter, solution, count, temp):
         if grid[positions[i][0]][positions[i][1]].type == 'road' and last_move[i] != solution[-1]:
             temp = move[i]
             dfs_move(grid, positions[i], visited_houses[:], counter, solution[:], count, temp)
-
-    for z in range(len(positions)):
-        if grid[positions[z][0]][positions[z][1]].type == 'garbage_dump':
-            solutions.append(solution[:])
-            return 0
 
     return 0
 
@@ -330,20 +324,7 @@ def bfs_move(grid, position, count):
                     counter += 1
 
 
-def check_solutions(count):
-    house_move = ['LH', 'UH', 'RH', 'DH']
-    temp = len(solutions) - 1
-    while temp >= 0:
-        counter = 0
-        for j in solutions[temp]:
-            if j in house_move:
-                counter += 1
-        if counter != count:
-            solutions.pop(temp)
-        temp -= 1
-
-
-def create_dataset(grid, solution, position):
+def create_dataset(grid, solution, position, dataset_by):
     f = open('dataset.txt', 'a')
     move = ['L', 'U', 'R', 'D']
     house_move = ['LH', 'UH', 'RH', 'DH']
