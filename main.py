@@ -10,7 +10,8 @@ from sklearn.model_selection import train_test_split
 from helpers import create_dataset, train_linear_regression, get_linear_regression_decision_test
 
 from helpers import get_map, display_text, create_grid, color_grid, dfs_move, find_houses, solutions, check_solutions, \
-    get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test
+    get_data_tree_from_file, train_decision_tree, decision_tree_move, get_tree_decision_test, create_dataset_for_rabbit, \
+    create_rabbit_model, move_rabbit
 
 
 #decision tree
@@ -76,10 +77,17 @@ while x == 0:
         #         index = i
         #
         # solution = solution[index]
-        # create_dataset(grid, solution, position)
+        # create_dataset_for_rabbit(grid, solution, position)
         # END of DFS
+
         solution = decision_tree_move(grid, position, clf, regr, count)
         print(solution)
+
+        create_rabbit_model()
+        os.system('vw -i {} -t {} -p {} --quiet'.format(os.path.join('.', 'rabbit.model'),
+                                                        os.path.join('.', 'input.txt'),
+                                                        os.path.join('.', 'output.txt')))
+
         while solution:
             display_text(myfont, DISPLAYSURF,
                          f"Ilość śmieci w śmieciarce: {garbage_amount}/{garbage_collector.container_capacity}", 600,
